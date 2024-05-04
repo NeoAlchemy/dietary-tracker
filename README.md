@@ -1,5 +1,20 @@
-# React basic
+# Dietary Tracker
 
-[Azure Static Web Apps](https://docs.microsoft.com/azure/static-web-apps/overview) allows you to easily build [React](https://reactjs.org/) apps in minutes. Use this repo with the [React quickstart](https://docs.microsoft.com/azure/static-web-apps/getting-started?tabs=react) to build and customize a new static site.
+> Need to be on Node v16
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Setup
+
+1. install static web app cli
+
+```bash
+npm install -D @azure/static-web-apps-cli
+```
+
+## Run Locally
+
+1. build locally
+
+```bash
+npm install
+npm run build
+```
