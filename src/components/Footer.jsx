@@ -6,7 +6,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import Paper from '@mui/material/Paper';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { BrowserRouter, Link, RouterLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 
 export default function FixedBottomNavigation() {
