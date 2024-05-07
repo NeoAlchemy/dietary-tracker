@@ -9,6 +9,8 @@ def message(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request.')
 
     input = req.params.get('input')
+    response = ''
+    
     if not input:
         try:
             req_body = req.get_json()
