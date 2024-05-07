@@ -1,5 +1,12 @@
 {
-    "navigationFallback": {
-        "rewrite": "/index.html"
-    }
-}
+    "platform": {
+        "apiRuntime": "python:3.8"
+    },
+    "routes": [
+        {
+            "route": "/api/*",
+            "methods": ["GET"],
+            "allowedRoles": ["anonymous"]
+        }
+    ]
+  }
