@@ -1,6 +1,6 @@
 {
     "platform": {
-        "apiRuntime": "python:3.8"
+        "apiRuntime": "python:3.10"
     },
     "routes": [
         {
