@@ -19,7 +19,10 @@ async def message(req: func.HttpRequest) -> func.HttpResponse:
         else:
             input = req_body.get('input')
             
-            client = OpenAI()
+            client = OpenAI(
+                organization='org-W0yiHQz05KvGawnWjdyzc09s',
+                project='proj_GUaZv3zs1gDGWrTzf5iFQYch',
+            )
             response = await client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
@@ -38,6 +41,7 @@ async def message(req: func.HttpRequest) -> func.HttpResponse:
                 frequency_penalty=0,
                 presence_penalty=0
             )
+            logging.info(response)
 
     if input:
         return func.HttpResponse(response)
