@@ -31,12 +31,15 @@ def message(req: func.HttpRequest) -> func.HttpResponse:
             project='proj_GUaZv3zs1gDGWrTzf5iFQYch',
             api_key=os.environ.get("OPENAI_API_KEY")
         )
+        with open("system_prompt.txt", "r") as system_prompt_file:
+            system_prompt = system_prompt_file.read()
+
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {
                 "role": "system",
-                "content": "You are a dietary agent that allows users to enter natural language on what they drink concerning caffeine and then respond back in a JSON object the parsed inputs.  The JSON would consist of the name of the beverage, the fluid ounces of the beverage, how much caffeine there was in total rounded to the nearest whole number, and the date should only be filled with how many minutes to subtract from the current time displayed in minutes .  Use your knowledge to find out restaurant cup sizes to know volume amounts.\n\nSample JSON:\n{\n    name: \"\",\n    volume: \"\",\n    unit: \"ounces\",\n    caffeine: \"\",\n    date: \"\",\n}\n\nThings to know:\n- a small can is 10 ounces\n- a can of is 12 ounces.\n- a tall can is 16 ounces.\n- a bottle is 20 ounces\n- An ounce of Dr Pepper contains 3.41666 mg of caffeine\n- An ounce of Monster contains 10 mg of caffeine\n- An ounce of Red Bull contains 9.25 mg of caffeine\n\nIf you don't have enough information return an error statement that of what information you are missing.  Provide error in a json with a single error property.\n\nSample Error JSON:\n{ \"error\": \"\" }"
+                "content": system_prompt
                 },
                 {
                 "role": "user",
@@ -55,6 +58,6 @@ def message(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse(response.choices[0].message.content)
     else:
         return func.HttpResponse(
-             "This HTTP triggered function executed successfully. Pass an input in the query string or in the request body for a personalized response.",
+             "Missing input",
              status_code=200
         )

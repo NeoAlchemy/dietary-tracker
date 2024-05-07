@@ -2,11 +2,12 @@ import * as React from 'react';
 import { useState } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
+import LoadingButton from '@mui/lab/LoadingButton';
 import Typography from '@mui/material/Typography';
 
 export default function Tracker() {
   const [input, setInput] = useState('');
+  const [loading, setLoading] = React.useState(false);
 
   const darkTheme = createTheme({
     palette: {
@@ -21,9 +22,11 @@ export default function Tracker() {
   }); 
 
   const handleSubmit = () => {
+    setLoading(true)
     fetch(`/api/message?input=${input}`)
       .then(response => response.json())
       .then(data => {
+        setLoading(false)
         // Handle data from API response
         if (!data.error) { 
           alert(" a " + data.volume + " " + data.unit + " " + data.name+" has " + data.caffeine + " mg of caffeine");
@@ -33,6 +36,8 @@ export default function Tracker() {
       })
       .catch(error => {
         // Handle errors
+        setLoading(false)
+        alert("error")
         console.error('Error fetching data:', error);
       });
   };
@@ -57,7 +62,14 @@ export default function Tracker() {
           onChange={(e) => setInput(e.target.value)}
         />
       </div>
-      <Button variant="contained" onClick={handleSubmit} style={{ marginLeft: 'auto', display: 'block' }}>Submit</Button>
+      <LoadingButton
+        onClick={handleSubmit}
+        loading={loading}
+        variant="contained"
+        sx={{ display: 'block', marginLeft: 'auto'}}
+      >
+        <span>Submit</span>
+      </LoadingButton>
     </ThemeProvider>
   );
 }
