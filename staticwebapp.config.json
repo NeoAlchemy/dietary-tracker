@@ -7,6 +7,21 @@
             "route": "/api/*",
             "methods": ["GET"],
             "allowedRoles": ["anonymous"]
+        },
+        {
+            "route": "/tracker/*",
+            "methods": ["GET"],
+            "allowedRoles": ["anonymous"]
+        },
+        {
+            "route": "/dashboard/*",
+            "methods": ["GET"],
+            "allowedRoles": ["anonymous"]
+        },
+        {
+            "route": "/history/*",
+            "methods": ["GET"],
+            "allowedRoles": ["anonymous"]
         }
     ]
   }
