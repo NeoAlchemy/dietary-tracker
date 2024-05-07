@@ -1,12 +1,15 @@
 import azure.functions as func
 import logging
+import json
+import os
 from openai import OpenAI
+from types import SimpleNamespace
 from dotenv import load_dotenv
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.FUNCTION)
 
 @app.route(route="message")
-async def message(req: func.HttpRequest) -> func.HttpResponse:
+def message(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request.')
 
     input = req.params.get('input')
@@ -21,13 +24,14 @@ async def message(req: func.HttpRequest) -> func.HttpResponse:
             input = req_body.get('input')
 
     if input:
-        
+        load_dotenv()
+        logging.info(os.environ.get("OPENAI_API_KEY"))
         client = OpenAI(
             organization='org-W0yiHQz05KvGawnWjdyzc09s',
             project='proj_GUaZv3zs1gDGWrTzf5iFQYch',
             api_key=os.environ.get("OPENAI_API_KEY")
         )
-        response = await client.chat.completions.create(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {
@@ -45,8 +49,10 @@ async def message(req: func.HttpRequest) -> func.HttpResponse:
             frequency_penalty=0,
             presence_penalty=0
         )
-        logging.info(response)
-        return func.HttpResponse(response)
+        dietaryData = json.loads(response.choices[0].message.content, object_hook=lambda d: SimpleNamespace(**d))
+        
+        logging.info(dietaryData)
+        return func.HttpResponse(response.choices[0].message.content)
     else:
         return func.HttpResponse(
              "This HTTP triggered function executed successfully. Pass an input in the query string or in the request body for a personalized response.",

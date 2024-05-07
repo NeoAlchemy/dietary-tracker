@@ -25,7 +25,11 @@ export default function Tracker() {
       .then(response => response.json())
       .then(data => {
         // Handle data from API response
-        console.log(data);
+        if (!data.error) { 
+          alert(" a " + data.volume + " " + data.unit + " " + data.name+" has " + data.caffeine + " mg of caffeine");
+        } else {
+          alert(data.error)
+        }
       })
       .catch(error => {
         // Handle errors
