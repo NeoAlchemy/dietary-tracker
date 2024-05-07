@@ -9,17 +9,17 @@
             "allowedRoles": ["anonymous"]
         },
         {
-            "route": "/tracker/*",
+            "route": "/tracker*",
             "methods": ["GET"],
             "allowedRoles": ["anonymous"]
         },
         {
-            "route": "/dashboard/*",
+            "route": "/dashboard*",
             "methods": ["GET"],
             "allowedRoles": ["anonymous"]
         },
         {
-            "route": "/history/*",
+            "route": "/history*",
             "methods": ["GET"],
             "allowedRoles": ["anonymous"]
         }
