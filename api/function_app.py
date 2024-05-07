@@ -5,7 +5,7 @@ from openai import OpenAI
 app = func.FunctionApp(http_auth_level=func.AuthLevel.FUNCTION)
 
 @app.route(route="message")
-def message(req: func.HttpRequest) -> func.HttpResponse:
+async def message(req: func.HttpRequest) -> func.HttpResponse:
     logging.info('Python HTTP trigger function processed a request.')
 
     input = req.params.get('input')
@@ -20,7 +20,7 @@ def message(req: func.HttpRequest) -> func.HttpResponse:
             input = req_body.get('input')
             
             client = OpenAI()
-            response = client.chat.completions.create(
+            response = await client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
                     {
