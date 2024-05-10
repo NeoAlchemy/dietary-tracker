@@ -23,7 +23,7 @@ export default function Tracker() {
 
   const handleSubmit = () => {
     setLoading(true)
-    fetch(`/api/caffeine?input=${input}`)
+    fetch(`/api/dietary?input=${input}`)
       .then(response => response.json())
       .then(data => {
         setLoading(false)
