@@ -93,13 +93,13 @@ export default function Dashboard() {
               <Card sx={{ backgroundColor: '#F25774' }}>
                 <CardContent>
                   <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                    Protein Monitoring Widget
+                    Sugar Monitoring Widget
                   </Typography>
                   <Typography variant="h5" component="div">
-                    Daily Protein Goal
+                    Daily Snacks Goal
                   </Typography>
                   <Typography variant="h3" component="div">
-                    224g
+                    30mg
                   </Typography>
                 </CardContent>
                 <CardActions>
