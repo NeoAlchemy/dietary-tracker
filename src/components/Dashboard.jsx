@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useEffect, useState } from 'react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -18,6 +19,26 @@ const Item = styled(Paper)(({ theme }) => ({
 }));
 
 export default function Dashboard() {
+
+  const [caffeineTotal, setCaffeineTotal] = useState('--');
+
+  useEffect(() => {
+    fetch(`/api/dashboard?occurance=DAILY`)
+      .then(response => response.json())
+      .then(data => {
+        if (!data.error) { 
+          setCaffeineTotal(data.caffeineTotal);
+          
+        } else {
+          alert(data.error)
+        }
+      })
+      .catch(error => {
+        // Handle errors
+        alert("error")
+        console.error('Error fetching data:', error);
+      });
+  }, []);
   
   const darkTheme = createTheme({
     palette: {
@@ -63,7 +84,7 @@ export default function Dashboard() {
                     Current Caffeine intake
                   </Typography>
                   <Typography variant="h3" component="div">
-                    230mg
+                    {caffeineTotal}mg
                   </Typography>
                 </CardContent>
                 <CardActions>

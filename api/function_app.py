@@ -116,3 +116,113 @@ def getHistoryList(req: func.HttpRequest) -> func.HttpResponse:
 
     return func.HttpResponse(json.dumps(items))
 
+@app.route(route="historyItem", methods=['DELETE'])
+def deleteHistoryItem(req: func.HttpRequest) -> func.HttpResponse:
+    logging.info('Python HTTP trigger function processed a request.')
+
+    input = req.params.get('id')
+
+    if input:
+        try: 
+            credential = DefaultAzureCredential()
+            client = CosmosClient(url="https://dietarytracker.documents.azure.com:443/", credential=credential)
+            database = client.get_database_client("Dietary")
+            container = database.get_container_client("dietarydb")
+            items = container.delete_item(item=input, partition_key=input)
+            logging.info(items)
+        except Exception as e:
+            logging.info(e)
+        return func.HttpResponse('{ "success": true}')
+    
+    else:
+        return func.HttpResponse(
+             '{"error": "Missing input" }',
+             status_code=200
+        )
+
+
+@app.route(route="historyItem", methods=['POST'])
+def postHistoryItem(req: func.HttpRequest) -> func.HttpResponse:
+    logging.info('Python HTTP trigger function processed a request.')
+
+    try:
+        body = req.get_json()  # Attempt to get the JSON body
+    except ValueError:
+        logging.error("Receiving body not in JSON format")
+        return func.HttpResponse("Bad request: body not in JSON format", status_code=400)
+
+    if body is None:
+        logging.error("No data found in the request")
+        return func.HttpResponse("Bad request: no data found", status_code=400)
+
+    # Check if 'name' key exists in the body before accessing it
+    if 'id' in body:
+        logging.info(body)
+    else:
+        logging.info("No id in the body")
+
+    try: 
+        credential = DefaultAzureCredential()
+        client = CosmosClient(url="https://dietarytracker.documents.azure.com:443/", credential=credential)
+        database = client.get_database_client("Dietary")
+        container = database.get_container_client("dietarydb")
+        item = container.read_item(item=body['id'], partition_key=body['id'])
+        item['name'] = body['name']
+        item['volume'] = body['volume']
+        item['unit'] = body['unit']
+        item['caffeine'] = body['caffeine']
+        item['date'] = body['date']
+        item['id'] = body['id']
+        response = container.replace_item(item=item, body=item)
+
+    except Exception as e:
+        logging.error(e)
+
+    return func.HttpResponse('{ "success": True}')
+
+
+@app.route(route="dashboard", methods=['GET'])
+def getDashboard(req: func.HttpRequest) -> func.HttpResponse:
+    logging.info('Python HTTP trigger function processed a request.')
+    count = 0
+    dashboard = {}
+    caffeine = 0
+    occurance = req.params.get('occurance')
+
+    if occurance:
+
+        count = 0
+        if occurance == 'DAILY': 
+            count = '1'
+        elif occurance == 'WEEKLY':
+            count = '7'
+        elif occurance == 'MONTHLY':
+            count = '30'
+        
+        
+        try: 
+            credential = DefaultAzureCredential()
+            client = CosmosClient(url="https://dietarytracker.documents.azure.com:443/", credential=credential)
+            database = client.get_database_client("Dietary")
+            container = database.get_container_client("dietarydb")
+            items = list(container.query_items(query='SELECT * FROM c WHERE DateTimeDiff("day", c.date, GetCurrentDateTime()) <= {0}'.format(count), enable_cross_partition_query=True))
+            logging.info(items)
+
+            caffeineTotal = 0
+            for item in items:
+                caffeineTotal = caffeineTotal + int(item['caffeine'])
+            
+            dashboard = { 'caffeineTotal' : caffeineTotal }
+            
+
+        except Exception as e:
+            logging.error(e)
+
+        return func.HttpResponse(json.dumps(dashboard))
+    
+    else:
+        return func.HttpResponse(
+             '{"error": "Missing occurance" }',
+             status_code=200
+        )
+

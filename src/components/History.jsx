@@ -8,14 +8,74 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
 
 export default function History() {
 
   function createData(name, volume, caffeine, date, id) {
-    return { name, volume, caffeine, date, id };
+    const formatter = new Intl.DateTimeFormat
+    const dateFormatted = new Date(date).toLocaleString('en-US', { timeZoneName: 'short' });
+    return { name, volume, caffeine, dateFormatted, id };
   }
 
   const [rows, setRows] = useState([]);
+  const [editRow, setEditRow] = useState(null);
+  const [open, setOpen] = useState(false);
+
+  const handleEditOpen = (row) => {
+    setEditRow(row);
+    setOpen(true);
+  };
+
+  const handleEditClose = () => {
+    setOpen(false);
+    setEditRow(null);
+  };
+
+  const handleSave = () => {
+    const updatedRows = rows.map(row => row.id === editRow.id ? editRow : row);
+    setRows(updatedRows);
+    fetch('/api/historyItem', {
+      method: "POST",
+      headers: {'Content-type': 'application/json'},
+      body: JSON.stringify({ name: editRow.name, volume: editRow.volume, caffeine: editRow.caffeine, unit: "ounces", date: new Date(editRow.dateFormatted), id: editRow.id }),
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log(data)
+    })
+    handleEditClose();
+  };
+
+  const handleDelete = (id) => {
+    const updatedRows = rows.filter(row => row.id !== id);
+    fetch('/api/historyItem?id='+id, {
+      method: "DELETE",
+      headers: {'Content-type': 'application/json'}
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log(data)
+    })
+    setRows(updatedRows);
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setEditRow({ ...editRow, [name]: value });
+  };
+
+  const formatDateForInput = (dateString) => {
+    const date = new Date(dateString);
+    const datePart = date.toLocaleDateString('en-CA'); // Format as YYYY-MM-DD
+    const timePart = date.toLocaleTimeString('en-US', { hour12: false }); // Format as HH:MM:SS
+    return `${datePart}T${timePart}`;
+  };
 
   useEffect(() => {
     fetch(`/api/historyList`)
@@ -56,7 +116,7 @@ export default function History() {
               <TableCell align="right">Volume</TableCell>
               <TableCell align="right">Caffeine&nbsp;(mg)</TableCell>
               <TableCell align="right">Date</TableCell>
-              <TableCell align="right">Id</TableCell>
+              <TableCell align="right">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -70,13 +130,63 @@ export default function History() {
                 </TableCell>
                 <TableCell align="right">{row.volume}</TableCell>
                 <TableCell align="right">{row.caffeine}</TableCell>
-                <TableCell align="right">{row.date}</TableCell>
-                <TableCell align="right">{row.id}</TableCell>
+                <TableCell align="right">{row.dateFormatted}</TableCell>
+                <TableCell align="right" data-id="{{row.id}}">
+                  <Button variant="outlined" size="small" onClick={() => handleEditOpen(row)}>Edit</Button>
+                  <Button variant="outlined" size="small" onClick={() => handleDelete(row.id)}>Delete</Button>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
+
+      <Dialog open={open} onClose={handleEditClose}>
+        <DialogTitle>Edit Row</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            name="name"
+            label="Name"
+            type="text"
+            fullWidth
+            value={editRow?.name || ''}
+            onChange={handleChange}
+          />
+          <TextField
+            margin="dense"
+            name="volume"
+            label="Volume"
+            type="number"
+            fullWidth
+            value={editRow?.volume || ''}
+            onChange={handleChange}
+          />
+          <TextField
+            margin="dense"
+            name="caffeine"
+            label="Caffeine (mg)"
+            type="number"
+            fullWidth
+            value={editRow?.caffeine || ''}
+            onChange={handleChange}
+          />
+          <TextField
+            margin="dense"
+            name="date"
+            label="Date"
+            type="datetime-local"
+            fullWidth
+            value={editRow ? formatDateForInput(editRow.dateFormatted) : ''}
+            onChange={handleChange}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleEditClose}>Cancel</Button>
+          <Button onClick={handleSave}>Save</Button>
+        </DialogActions>
+      </Dialog>
     </ThemeProvider>
   );
 }
