@@ -18,7 +18,6 @@ import DialogTitle from '@mui/material/DialogTitle';
 export default function History() {
 
   function createData(name, volume, caffeine, date, id) {
-    const formatter = new Intl.DateTimeFormat
     const dateFormatted = new Date(date).toLocaleString('en-US', { timeZoneName: 'short' });
     return { name, volume, caffeine, dateFormatted, id };
   }
