@@ -191,6 +191,7 @@ def getDashboard(req: func.HttpRequest) -> func.HttpResponse:
     dashboard = {}
     caffeine = 0
     occurance = req.params.get('occurance')
+    connection_string = os.environ.get('COSMOS_DB_CONNECTION_STRING')
 
     if occurance:
 
@@ -204,8 +205,7 @@ def getDashboard(req: func.HttpRequest) -> func.HttpResponse:
         
         
         try: 
-            credential = DefaultAzureCredential()
-            client = CosmosClient(url="https://dietarytracker.documents.azure.com:443/", credential=credential)
+            client = CosmosClient.from_connection_string(connection_string)
             database = client.get_database_client("Dietary")
             container = database.get_container_client("dietarydb")
             items = list(container.query_items(query='SELECT * FROM c WHERE DateTimeDiff("day", c.date, GetCurrentDateTime()) <= {0}'.format(count), enable_cross_partition_query=True))
