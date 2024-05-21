@@ -73,6 +73,7 @@ def getDietary(req: func.HttpRequest) -> func.HttpResponse:
 @app.route(route="dietary", methods=['POST'])
 def postDietary(req: func.HttpRequest) -> func.HttpResponse:
     logger.info('Python HTTP trigger function processed a request.')
+    connection_string = os.environ.get('COSMOS_DB_CONNECTION_STRING')
 
     try:
         body = req.get_json()  # Attempt to get the JSON body
@@ -92,8 +93,7 @@ def postDietary(req: func.HttpRequest) -> func.HttpResponse:
         logger.info("No name in the body")
 
     try: 
-        credential = DefaultAzureCredential()
-        client = CosmosClient(url="https://dietarytracker.documents.azure.com:443/", credential=credential)
+        client = CosmosClient.from_connection_string(connection_string)
         database = client.get_database_client("Dietary")
         container = database.get_container_client("dietarydb")
         created_item = container.upsert_item(body=body)
@@ -106,10 +106,10 @@ def postDietary(req: func.HttpRequest) -> func.HttpResponse:
 @app.route(route="historyList", methods=['GET'])
 def getHistoryList(req: func.HttpRequest) -> func.HttpResponse:
     logger.info('Python HTTP trigger function processed a request.')
+    connection_string = os.environ.get('COSMOS_DB_CONNECTION_STRING')
 
     try: 
-        credential = DefaultAzureCredential()
-        client = CosmosClient(url="https://dietarytracker.documents.azure.com:443/", credential=credential)
+        client = CosmosClient.from_connection_string(connection_string)
         database = client.get_database_client("Dietary")
         container = database.get_container_client("dietarydb")
         items = list(container.query_items(query='SELECT * FROM c WHERE DateTimeDiff("day", c.date, GetCurrentDateTime()) <= 30', enable_cross_partition_query=True))
@@ -122,13 +122,12 @@ def getHistoryList(req: func.HttpRequest) -> func.HttpResponse:
 @app.route(route="historyItem", methods=['DELETE'])
 def deleteHistoryItem(req: func.HttpRequest) -> func.HttpResponse:
     logger.info('Python HTTP trigger function processed a request.')
-
+    connection_string = os.environ.get('COSMOS_DB_CONNECTION_STRING')
     input = req.params.get('id')
 
     if input:
         try: 
-            credential = DefaultAzureCredential()
-            client = CosmosClient(url="https://dietarytracker.documents.azure.com:443/", credential=credential)
+            client = CosmosClient.from_connection_string(connection_string)
             database = client.get_database_client("Dietary")
             container = database.get_container_client("dietarydb")
             items = container.delete_item(item=input, partition_key=input)
@@ -147,6 +146,7 @@ def deleteHistoryItem(req: func.HttpRequest) -> func.HttpResponse:
 @app.route(route="historyItem", methods=['POST'])
 def postHistoryItem(req: func.HttpRequest) -> func.HttpResponse:
     logger.info('Python HTTP trigger function processed a request.')
+    connection_string = os.environ.get('COSMOS_DB_CONNECTION_STRING')
 
     try:
         body = req.get_json()  # Attempt to get the JSON body
@@ -165,8 +165,7 @@ def postHistoryItem(req: func.HttpRequest) -> func.HttpResponse:
         logger.info("No id in the body")
 
     try: 
-        credential = DefaultAzureCredential()
-        client = CosmosClient(url="https://dietarytracker.documents.azure.com:443/", credential=credential)
+        client = CosmosClient.from_connection_string(connection_string)
         database = client.get_database_client("Dietary")
         container = database.get_container_client("dietarydb")
         item = container.read_item(item=body['id'], partition_key=body['id'])
