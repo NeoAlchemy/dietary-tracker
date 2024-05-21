@@ -5,6 +5,7 @@ import os
 import uuid
 from openai import OpenAI
 from types import SimpleNamespace
+from azure.monitor.opentelemetry import configure_azure_monitor
 from dotenv import load_dotenv
 from azure.cosmos import CosmosClient
 from azure.identity import DefaultAzureCredential
@@ -12,6 +13,7 @@ from azure.identity import DefaultAzureCredential
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.FUNCTION)
 load_dotenv()
+configure_azure_monitor()
 
 @app.route(route="dietary", methods=['GET'])
 def getDietary(req: func.HttpRequest) -> func.HttpResponse:
