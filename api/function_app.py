@@ -221,7 +221,7 @@ def getDashboard(req: func.HttpRequest) -> func.HttpResponse:
         except Exception as e:
             logger.error(e)
             return func.HttpResponse(
-                '{"error": "{0}" }'.format(str(e)),
+            '{"error": "error occurred" }',
              status_code=200
         )
 
