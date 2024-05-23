@@ -8,3 +8,5 @@ python-dotenv
 azure-cosmos 
 azure-identity
 azure-monitor-opentelemetry
+pytz
+datetime

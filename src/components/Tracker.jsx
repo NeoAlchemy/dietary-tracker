@@ -12,7 +12,7 @@ import Button from '@mui/material/Button';
 export default function Tracker() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = React.useState(false);
-  const [data, setData] = React.useState({name: "", volume: ""});
+  const [data, setData] = React.useState([{name: "", volume: ""}]);
   const [open, setOpen] = React.useState(false);
 
   const handleClose = () => {
@@ -55,7 +55,9 @@ export default function Tracker() {
 
   const handleConfirm = () => {
     setOpen(false)
-    data.date = new Date()
+    for (let i=0; i < data.length; i++) {
+      data[i].date = new Date()
+    }
     fetch('/api/dietary', {
         method: "POST",
         headers: {'Content-type': 'application/json'},
@@ -64,6 +66,7 @@ export default function Tracker() {
       .then(response => response.json())
       .then(data => {
         console.log(data)
+        setData([])
       })
   }
   
@@ -72,7 +75,9 @@ export default function Tracker() {
       <div style={{ marginTop: "70px"}}>
         <Dialog onClose={handleClose} open={open}>
           <DialogTitle>Food Item</DialogTitle>
-          <Typography variant="span" component="div" sx={{textAlign: 'center'}}>{data.volume} ounce of {data.name}</Typography>
+          { data.map((dataItem) => (
+            <Typography variant="span" component="div" sx={{textAlign: 'center'}}>{dataItem.volume} ounce of {dataItem.name}</Typography>
+          ))}
           <DialogActions>
             <Button onClick={handleClose}>Retry</Button>
             <Button onClick={handleConfirm} autoFocus>Confirm</Button>

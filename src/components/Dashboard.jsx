@@ -21,6 +21,7 @@ const Item = styled(Paper)(({ theme }) => ({
 export default function Dashboard() {
 
   const [caffeineTotal, setCaffeineTotal] = useState('--');
+  const [waterTotal, setWaterTotal] = useState('--');
 
   useEffect(() => {
     fetch(`/api/dashboard?occurance=DAILY`)
@@ -28,6 +29,7 @@ export default function Dashboard() {
       .then(data => {
         if (!data.error) { 
           setCaffeineTotal(data.caffeineTotal);
+          setWaterTotal(data.waterTotal)
           
         } else {
           alert(data.error)
@@ -57,24 +59,6 @@ export default function Dashboard() {
           </Typography>
           <Masonry columns={2} spacing={2}>
             <Item>
-              <Card sx={{ backgroundColor: '#F25774' }}>
-                <CardContent>
-                  <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                    Caffeine Monitoring Widget
-                  </Typography>
-                  <Typography variant="h5" component="div">
-                    Reduce caffeine week over week by 10%
-                  </Typography>
-                  <Typography variant="h3" component="div">
-                    Week Total: 800mg
-                  </Typography>
-                </CardContent>
-                <CardActions>
-                  <Button size="small">Edit</Button>
-                </CardActions>
-              </Card>
-            </Item>
-            <Item>
               <Card sx={{ backgroundColor: '#04593A' }}>
                 <CardContent>
                   <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
@@ -102,7 +86,7 @@ export default function Dashboard() {
                     Daily Water Intake Goal
                   </Typography>
                   <Typography variant="h3" component="div">
-                    64 ounces
+                    {waterTotal} ounces
                   </Typography>
                 </CardContent>
                 <CardActions>
